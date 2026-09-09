@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bashan Livestock Feeds - POS Login</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
+    </script>
+    
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Page-specific CSS -->
+    <link rel="stylesheet" href="css/login.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+</head>
+<body>
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Main Container -->
+    <div class="login-container">
+        <!-- Decorative Top Bar -->
+        <div class="login-top-bar"></div>
+        
+        <!-- Login Card -->
+        <div class="login-card">
+            <!-- Logo Section -->
+            <div class="login-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 60 60" width="60" height="60">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#66bb6a;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#00e676;stop-opacity:1"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="30" cy="30" r="28" fill="none" stroke="url(#logoGrad)" stroke-width="2"/>
+                        <path d="M20 35 L28 43 L40 25" fill="none" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="30" cy="30" r="3" fill="url(#logoGrad)"/>
+                    </svg>
+                </div>
+                <h1 class="login-title">
+                    <span class="title-main">BASHAN</span>
+                    <span class="title-sub">Livestock Feeds</span>
+                </h1>
+                <p class="login-subtitle">Point of Sale System</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="login-form" id="loginForm" autocomplete="off">
+                <!-- Role Selection -->
+                <div class="role-selector">
+                    <button type="button" class="role-btn active" data-role="seller" id="roleSeller">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>Seller</span>
+                    </button>
+                    <button type="button" class="role-btn" data-role="manager" id="roleManager">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15l-3 3m0 0l-3-3m3 3V9m0 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                            <path d="M5 21h14"/>
+                        </svg>
+                        <span>Manager</span>
+                    </button>
+                </div>
+                
+                <!-- Password Input -->
+                <div class="input-group">
+                    <label class="input-label">Password</label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            id="passwordInput" 
+                            class="password-input" 
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword" tabindex="-1">
+                            <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="input-error" id="passwordError"></p>
+                </div>
+                
+                <!-- Remember Me -->
+                <div class="remember-me">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        <span class="remember-text">Remember this device</span>
+                    </label>
+                    <span class="remember-info" title="Saves session for 7 days">ⓘ</span>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Access POS</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Loading State -->
+                <div class="login-loading" id="loginLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Verifying...</p>
+                </div>
+            </form>
+            
+            <!-- Lockout Message -->
+            <div class="lockout-message" id="lockoutMessage">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff5252" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <p>Too many attempts</p>
+                <p class="lockout-timer" id="lockoutTimer">Please wait 15 minutes</p>
+            </div>
+            
+            <!-- Attempts Counter -->
+            <div class="attempts-indicator" id="attemptsIndicator">
+                <div class="attempt-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <p class="attempts-text">Attempts remaining: <strong id="attemptsLeft">5</strong></p>
+            </div>
+        </div>
+        
+        <!-- Footer Info -->
+        <div class="login-footer">
+            <p class="version-text">v<span id="appVersion">1.0.0</span></p>
+            <p class="copyright-text">© 2024 Bashan Livestock Feeds</p>
+            <p class="secure-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                </svg>
+                Secure Connection
+            </p>
+        </div>
+        
+        <!-- Offline Warning -->
+        <div class="offline-warning" id="offlineWarning">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffd740" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>No internet connection. Some features may be unavailable.</span>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Particles Script -->
+    <script src="js/particles.js"></script>
+    
+    <!-- Login Script -->
+    <script src="js/login.js"></script>
+</body>
+</html>

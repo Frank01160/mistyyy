@@ -1,0 +1,441 @@
+/* ============================================ */
+/* BASHAAN POS - SETTINGS PAGE STYLES           */
+/* ============================================ */
+
+.settings-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+/* Category List Styles */
+.categories-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--green-primary);
+}
+
+.category-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-order {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.category-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.category-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.category-actions .icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.category-actions .edit-btn:hover {
+    color: #40c4ff;
+    border-color: #40c4ff;
+    background: rgba(64, 196, 255, 0.1);
+}
+
+.category-actions .delete-btn:hover {
+    color: #ff5252;
+    border-color: #ff5252;
+    background: rgba(255, 82, 82, 0.1);
+}
+
+.add-category-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.add-category-row .settings-input {
+    flex: 1;
+}
+
+.empty-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px;
+    font-style: italic;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 25px;
+    background: rgba(13, 40, 24, 0.8);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--green-primary);
+}
+
+.page-title {
+    font-size: 20px;
+    color: var(--text-primary);
+}
+
+.top-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-badge {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Settings Content Layout */
+.settings-content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.settings-nav {
+    width: 220px;
+    background: rgba(13, 40, 24, 0.4);
+    border-right: 1px solid var(--card-border);
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.settings-nav-btn {
+    padding: 12px 15px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    transition: var(--transition);
+}
+
+.settings-nav-btn:hover {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--text-primary);
+}
+
+.settings-nav-btn.active {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--green-accent);
+    font-weight: 600;
+}
+
+.settings-panels {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    max-height: calc(100vh - 70px);
+}
+
+.settings-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    max-width: 700px;
+}
+
+.settings-panel.active {
+    display: block;
+}
+
+.settings-panel h2 {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.form-group small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.settings-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(13, 40, 24, 0.6);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition);
+}
+
+.settings-input:focus {
+    border-color: var(--green-primary);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.settings-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Categories */
+.add-category-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-category-row .settings-input {
+    flex: 1;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.category-item:hover {
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.category-name {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.category-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: var(--transition);
+}
+
+.edit-cat-btn {
+    color: var(--info);
+}
+
+.edit-cat-btn:hover { background: rgba(64, 196, 255, 0.1); }
+
+.delete-cat-btn {
+    color: var(--danger);
+}
+
+.delete-cat-btn:hover { background: rgba(255, 82, 82, 0.1); }
+
+.empty-message {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 30px;
+}
+
+/* Security Sections */
+.security-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.security-section h3 {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+/* Data Management */
+.data-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.data-section h3 {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.data-section p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.danger-zone {
+    border-color: rgba(255, 82, 82, 0.3);
+}
+
+.danger-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.danger-item:last-child {
+    border-bottom: none;
+}
+
+.danger-item strong {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.danger-item p {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin: 5px 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-content {
+        flex-direction: column;
+    }
+    
+    .settings-nav {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+    }
+    
+    .settings-nav-btn {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+    
+    .settings-panels {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .danger-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

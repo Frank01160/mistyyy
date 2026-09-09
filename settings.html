@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bashan POS - Settings</title>
+    
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/settings.css">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="settings-container">
+        
+        <header class="top-bar">
+            <div class="top-left">
+                <a href="pos.html" class="back-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+                <h1 class="page-title">⚙️ Settings</h1>
+            </div>
+            <div class="top-right">
+                <span class="user-badge" id="userBadge"></span>
+                <button class="icon-btn logout-btn" id="logoutBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <div class="settings-content">
+            
+            <!-- Navigation Tabs -->
+            <div class="settings-nav">
+                <button class="settings-nav-btn active" data-tab="business">🏪 Business Info</button>
+                <button class="settings-nav-btn" data-tab="categories">📂 Categories</button>
+                <button class="settings-nav-btn" data-tab="security">🔒 Security</button>
+                <button class="settings-nav-btn" data-tab="preferences">⚡ Preferences</button>
+                <button class="settings-nav-btn" data-tab="data">💾 Data Management</button>
+            </div>
+            
+            <!-- Settings Panels -->
+            <div class="settings-panels">
+                
+                <!-- Business Info Panel -->
+                <div class="settings-panel active" id="panel-business">
+                    <h2>Business Information</h2>
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="businessName" class="settings-input" placeholder="Bashan Livestock Feeds">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="businessAddress" class="settings-input" placeholder="Enter business address">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="businessPhone" class="settings-input" placeholder="+254...">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="businessEmail" class="settings-input" placeholder="info@bashan.co.ke">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Receipt Footer Message</label>
+                        <input type="text" id="receiptFooter" class="settings-input" placeholder="Thank you for your business!">
+                    </div>
+                    <button class="green-btn" id="saveBusinessBtn">💾 Save Business Info</button>
+                </div>
+                
+                <!-- Categories Panel -->
+                <div class="settings-panel" id="panel-categories">
+                    <h2>Manage Categories</h2>
+                    <div class="add-category-row">
+                        <input type="text" id="newCategoryName" class="settings-input" placeholder="New category name">
+                        <button class="green-btn" id="addCategoryBtn">➕ Add Category</button>
+                    </div>
+                    <div class="categories-list" id="categoriesList">
+                        <p class="empty-message">Loading categories...</p>
+                    </div>
+                </div>
+                
+                <!-- Security Panel -->
+                <div class="settings-panel" id="panel-security">
+                    <h2>Password & Security</h2>
+                    <div class="security-section">
+                        <h3>Manager Password</h3>
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="managerCurrentPass" class="settings-input">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="managerNewPass" class="settings-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="managerConfirmPass" class="settings-input">
+                        </div>
+                        <button class="green-btn" id="updateManagerPassBtn">🔑 Update Manager Password</button>
+                    </div>
+                    
+                    <div class="security-section">
+                        <h3>Seller Password</h3>
+                        <div class="form-group">
+                            <label>Current Manager Password (required)</label>
+                            <input type="password" id="sellerAuthPass" class="settings-input">
+                        </div>
+                        <div class="form-group">
+                            <label>New Seller Password</label>
+                            <input type="password" id="sellerNewPass" class="settings-input">
+                        </div>
+                        <button class="green-btn" id="updateSellerPassBtn">🔑 Update Seller Password</button>
+                    </div>
+                    
+                    <div class="security-section">
+                        <h3>Session Settings</h3>
+                        <div class="form-group">
+                            <label>Auto-logout (minutes)</label>
+                            <input type="number" id="sessionTimeout" class="settings-input" value="30" min="5" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Failed Login Attempts</label>
+                            <input type="number" id="maxAttempts" class="settings-input" value="5" min="3" max="10">
+                        </div>
+                        <button class="green-btn" id="saveSessionBtn">💾 Save Session Settings</button>
+                    </div>
+                </div>
+                
+                <!-- Preferences Panel -->
+                <div class="settings-panel" id="panel-preferences">
+                    <h2>System Preferences</h2>
+                    <div class="form-group">
+                        <label>Default Ngunia Size (kg)</label>
+                        <input type="number" id="defaultNguniaSize" class="settings-input" value="1000" min="1">
+                        <small>Used for new products. Can be overridden per product.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Global Low Stock Threshold (kg)</label>
+                        <input type="number" id="lowStockThreshold" class="settings-input" value="100" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Maximum Discount per Sale (KSH)</label>
+                        <input type="number" id="maxDiscount" class="settings-input" value="5000" min="0">
+                    </div>
+                    <button class="green-btn" id="savePreferencesBtn">💾 Save Preferences</button>
+                </div>
+                
+                <!-- Data Management Panel -->
+                <div class="settings-panel" id="panel-data">
+                    <h2>Data Management</h2>
+                    <div class="data-section">
+                        <h3>Export Data</h3>
+                        <p>Download all your data as a JSON backup file.</p>
+                        <button class="green-btn" id="exportDataBtn">📥 Export All Data</button>
+                    </div>
+                    
+                    <div class="data-section">
+                        <h3>Import Data</h3>
+                        <p>Restore data from a previous backup. This will merge with existing data.</p>
+                        <input type="file" id="importFile" accept=".json" style="display:none;">
+                        <button class="outline-btn" id="importDataBtn">📤 Import Data</button>
+                    </div>
+                    
+                    <div class="data-section danger-zone">
+                        <h3>⚠️ Danger Zone</h3>
+                        <div class="danger-item">
+                            <div>
+                                <strong>Clear Old Sales</strong>
+                                <p>Delete sales older than selected period.</p>
+                            </div>
+                            <select id="clearSalesPeriod" class="settings-input" style="width:auto;">
+                                <option value="3">Older than 3 months</option>
+                                <option value="6">Older than 6 months</option>
+                                <option value="12">Older than 12 months</option>
+                            </select>
+                            <button class="danger-btn" id="clearSalesBtn">🗑️ Clear Sales</button>
+                        </div>
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Reset All Stock</strong>
+                                <p>Set all product stock to zero. This cannot be undone!</p>
+                            </div>
+                            <button class="danger-btn" id="resetStockBtn">⚠️ Reset All Stock</button>
+                        </div>
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Delete All Data</strong>
+                                <p>Completely wipe all data. Export backup first!</p>
+                            </div>
+                            <button class="danger-btn" id="deleteAllBtn">💀 Delete Everything</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/firebase-config.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>
