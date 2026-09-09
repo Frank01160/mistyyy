@@ -1,20 +1,20 @@
-// ============================================
-// BASHAAN LIVESTOCK FEEDS POS
-// Firebase Configuration & Core Functions
-// ============================================
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB5eH7B9IbQb-slA6rphFhGhGwyXfj3moE",
-  authDomain: "bashan-pos-c539b.firebaseapp.com",
-  projectId: "bashan-pos-c539b",
-  storageBucket: "bashan-pos-c539b.firebasestorage.app",
-  messagingSenderId: "50077340319",
-  appId: "1:50077340319:web:345e7b89b9d2908ca988aa"
+  apiKey: "AIzaSyCnPxhTtqx2rqJjNp3Uor_8DkTXXeq9r60",
+  authDomain: "mistyyyy-756fc.firebaseapp.com",
+  projectId: "mistyyyy-756fc",
+  storageBucket: "mistyyyy-756fc.firebasestorage.app",
+  messagingSenderId: "440947601221",
+  appId: "1:440947601221:web:324823524d00a7adb3182c"
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
 
 // Enable offline persistence
 db.enablePersistence()
