@@ -146,33 +146,41 @@ class InventorySystem {
 
   // ---------- PRODUCTS ----------
   async loadProducts() {
-    try {
-      const snap = await BashanPOS.productsRef.where('archived', '==', false).get();
-      this.products = [];
-      snap.forEach(d => {
-        const data = d.data();
-        // Legacy migration: if old shape, convert to new
-        if (data.stockBase === undefined) {
-          const migrated = this.migrateLegacyProduct(data);
-          if (migrated) {
-            data.stockBase = migrated.stockBase;
-            data.baseUnit = migrated.baseUnit;
-            data.bulkUnit = migrated.bulkUnit || null;
-            data.bulkSize = migrated.bulkSize || 1;
-            data.priceBase = migrated.priceBase;
-            data.priceBulk = migrated.priceBulk || null;
-          }
-        }
-        this.products.push({ id: d.id, ...data });
-      });
-      this.renderTable();
-      this.loadStats();
-    } catch (e) {
-      console.error('loadProducts:', e);
-      BashanPOS.showNotification('Failed to load products', 'error');
-    }
-  }
+  try {
+    const snap = await BashanPOS.productsRef.where('archived', '==', false).get();
+    this.products = [];
+    const upgrades = [];
 
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.stockBase === undefined) {
+        const migrated = this.migrateLegacyProduct(data);
+        if (migrated) {
+          Object.assign(data, migrated);
+          upgrades.push({ id: d.id, patch: migrated });
+        }
+      }
+      this.products.push({ id: d.id, ...data });
+    });
+
+    if (upgrades.length) {
+      const batch = BashanPOS.db.batch();
+      upgrades.forEach(u => {
+        batch.update(BashanPOS.productsRef.doc(u.id), {
+          ...u.patch,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+      await batch.commit();
+      console.log(`✅ Migrated ${upgrades.length} legacy products`);
+    }
+
+    this.renderTable();
+    this.loadStats();
+  } catch (e) {
+    console.error('loadProducts:', e);
+  }
+}
   // Convert old UOM fields → new base/bulk shape
   migrateLegacyProduct(d) {
     const uom = d.uom || 'kg';
