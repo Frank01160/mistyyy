@@ -162,7 +162,18 @@ function getProductsRealtime(callback) {
   }, err => { console.error(err); callback([]); });
 }
 
-function getStockBase(p) { return Number(p.stockBase) || 0; }
+function getStockBase(p) {
+  if (!p) return 0;
+  if (p.stockBase !== undefined && p.stockBase !== null && p.stockBase !== '') {
+    const n = Number(p.stockBase);
+    if (Number.isFinite(n)) return n;
+  }
+  if (typeof p.currentStockKg === 'number')     return p.currentStockKg;
+  if (typeof p.currentStockCount === 'number')  return p.currentStockCount;
+  if (typeof p.currentStockLitres === 'number') return p.currentStockLitres;
+  if (typeof p.currentStockMetres === 'number') return p.currentStockMetres;
+  return 0;
+}
 function baseUnitsPer(p) { return p.bulkSize || 1; }
 
 async function updateStock(productId, newStockBase, reason, notes, userName, userId) {
