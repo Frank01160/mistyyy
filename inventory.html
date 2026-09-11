@@ -1,439 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bashan POS - Inventory Management</title>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    
-    <!-- Shared CSS -->
-    <link rel="stylesheet" href="css/animations.css">
-    
-    <!-- Page-specific CSS -->
-    <link rel="stylesheet" href="css/inventory.css">
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bashan POS - Inventory</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/inventory.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
 </head>
 <body>
-    <!-- Particles Canvas -->
-    <canvas id="particles-canvas"></canvas>
-    
-    <!-- Main Container -->
-    <div class="inventory-container">
-        
-        <!-- ============ TOP BAR ============ -->
-        <header class="top-bar">
-            <div class="top-left">
-                <a href="pos.html" class="back-btn" title="Back to POS">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                </a>
-                <h1 class="page-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                    </svg>
-                    Inventory Management
-                </h1>
-            </div>
-            <div class="top-right">
-                <div class="user-info">
-                    <span class="user-role" id="userRole"></span>
-                    <span class="user-name" id="userName"></span>
-                </div>
-                <button class="icon-btn" id="addProductBtn" title="Add Product">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"/>
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                </button>
-                <button class="icon-btn" id="historyBtn" title="Stock History">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                </button>
-                <button class="icon-btn logout-btn" id="logoutBtn" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                </button>
-            </div>
-        </header>
-        
-        <!-- ============ STATS BAR ============ -->
-        <div class="stats-bar">
-            <div class="stat-card">
-                <span class="stat-icon">📦</span>
-                <div class="stat-info">
-                    <span class="stat-value" id="totalProducts">0</span>
-                    <span class="stat-label">Total Products</span>
-                </div>
-            </div>
-            <div class="stat-card warning">
-                <span class="stat-icon">⚠️</span>
-                <div class="stat-info">
-                    <span class="stat-value" id="lowStockCount">0</span>
-                    <span class="stat-label">Low Stock</span>
-                </div>
-            </div>
-            <div class="stat-card danger">
-                <span class="stat-icon">❌</span>
-                <div class="stat-info">
-                    <span class="stat-value" id="outOfStockCount">0</span>
-                    <span class="stat-label">Out of Stock</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-icon">💰</span>
-                <div class="stat-info">
-                    <span class="stat-value" id="totalValue">KSH 0</span>
-                    <span class="stat-label">Total Stock Value</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ============ MAIN CONTENT ============ -->
-        <div class="inventory-main">
-            
-            <!-- ===== FILTERS ===== -->
-            <div class="inventory-filters">
-                <div class="search-box">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                    <input type="text" id="searchInventory" class="search-input" placeholder="Search products...">
-                </div>
-                
-                <select id="filterCategory" class="filter-select">
-                    <option value="all">All Categories</option>
-                </select>
-                
-                <select id="filterStatus" class="filter-select">
-                    <option value="all">All Status</option>
-                    <option value="in-stock">In Stock</option>
-                    <option value="low-stock">Low Stock</option>
-                    <option value="out-of-stock">Out of Stock</option>
-                </select>
-                
-                <button class="outline-btn" id="exportInventoryBtn">
-                    📄 Export CSV
-                </button>
-            </div>
-            
-            <!-- ===== PRODUCTS TABLE ===== -->
-            <div class="table-wrapper">
-                <table class="inventory-table" id="inventoryTable">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Ngunia Size</th>
-                            <th>Current Stock</th>
-                            <th>Stock Level</th>
-                            <th>Price/kg</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody">
-                        <tr class="loading-row">
-                            <td colspan="8">
-                                <div class="loading-spinner"></div>
-                                <p>Loading inventory...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<canvas id="particles-canvas"></canvas>
+
+<div class="inventory-container">
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="top-left">
+      <a href="pos.html" class="back-btn" title="Back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+      <h1 class="page-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+        Inventory
+      </h1>
     </div>
-    
-    <!-- ============ STOCK ADJUSTMENT MODAL ============ -->
-    <div class="modal-overlay" id="adjustStockModal">
-        <div class="modal-content adjust-modal">
-            <div class="modal-header">
-                <h2 id="adjustModalTitle">Adjust Stock</h2>
-                <button class="close-modal" id="closeAdjustModal">×</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="product-info-display" id="adjustProductInfo"></div>
-                
-                <div class="adjustment-tabs">
-                    <button class="adj-tab active" data-type="add" id="addTab">➕ Add Stock</button>
-                    <button class="adj-tab" data-type="remove" id="removeTab">➖ Remove Stock</button>
-                </div>
-                
-                <div class="adjustment-form">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>Ngunias</label>
-                            <input type="number" id="adjNgunias" class="adj-input" value="0" min="0" step="0.001">
-                        </div>
-                        <span class="plus-sign">+</span>
-                        <div class="input-group">
-                            <label>Extra Kg</label>
-                            <input type="number" id="adjKg" class="adj-input" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="calculated-total">
-                        <span>Total to <span id="adjTypeText">add</span>:</span>
-                        <strong id="adjTotalDisplay">0 kg (0 ngunias)</strong>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Reason <span class="required">*</span></label>
-                        <select id="adjReason" class="reason-select">
-                            <option value="">Select reason...</option>
-                            <option value="Supplier Delivery">Supplier Delivery</option>
-                            <option value="Stock Correction">Stock Correction</option>
-                            <option value="Returns">Customer Returns</option>
-                            <option value="Damaged">Damaged Goods</option>
-                            <option value="Expired">Expired Products</option>
-                            <option value="Theft">Theft/Loss</option>
-                            <option value="Transfer">Internal Transfer</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group" id="otherReasonGroup" style="display:none;">
-                        <label>Specify Reason</label>
-                        <input type="text" id="adjOtherReason" class="adj-input" placeholder="Enter reason...">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Notes</label>
-                        <textarea id="adjNotes" class="adj-textarea" placeholder="Additional notes (optional)"></textarea>
-                    </div>
-                    
-                    <div class="stock-preview">
-                        <span>Current Stock:</span>
-                        <strong id="currentStockDisplay">0 kg</strong>
-                        <span>→</span>
-                        <span>New Stock:</span>
-                        <strong id="newStockDisplay">0 kg</strong>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="outline-btn" id="cancelAdjustBtn">Cancel</button>
-                <button class="green-btn" id="confirmAdjustBtn">Confirm Adjustment</button>
-                <button class="danger-btn" id="confirmRemoveBtn" style="display:none;">Confirm Removal</button>
-            </div>
-        </div>
+    <div class="top-right">
+      <div class="user-info">
+        <span class="user-role" id="userRole"></span>
+        <span class="user-name" id="userName"></span>
+      </div>
+      <button class="icon-btn" id="addProductBtn" title="Add Product">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="icon-btn" id="historyBtn" title="Stock History">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button class="icon-btn logout-btn" id="logoutBtn" title="Logout">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
-    
-    <!-- ============ STOCK HISTORY MODAL ============ -->
-    <div class="modal-overlay" id="historyModal">
-        <div class="modal-content history-modal">
-            <div class="modal-header">
-                <h2>Stock Movement History</h2>
-                <button class="close-modal" id="closeHistoryModal">×</button>
-            </div>
-            
-            <div class="history-filters">
-                <select id="historyProduct" class="filter-select">
-                    <option value="all">All Products</option>
-                </select>
-                <select id="historyType" class="filter-select">
-                    <option value="all">All Types</option>
-                    <option value="add">Additions</option>
-                    <option value="remove">Removals</option>
-                </select>
-                <button class="outline-btn" id="exportHistoryBtn">📄 Export CSV</button>
-            </div>
-            
-            <div class="history-table-wrapper">
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Product</th>
-                            <th>Type</th>
-                            <th>Quantity</th>
-                            <th>Before</th>
-                            <th>After</th>
-                            <th>Reason</th>
-                            <th>Done By</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <tr class="loading-row">
-                            <td colspan="8">Loading history...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-icon">📦</span>
+      <div class="stat-info"><span class="stat-value" id="totalProducts">0</span><span class="stat-label">Products</span></div>
     </div>
-    <!-- ============ ADD PRODUCT MODAL ============ -->
-<div class="modal-overlay" id="addProductModal">
-    <div class="modal-content product-modal">
-        <div class="modal-header">
-            <h2 id="productModalTitle">Add New Product</h2>
-            <button class="close-modal" id="closeProductModal">×</button>
-        </div>
-        
-        <div class="modal-body">
-            <!-- Product Name -->
-            <div class="input-group">
-                <label>Product Name <span class="required">*</span></label>
-                <input type="text" id="productName" class="adj-input" placeholder="e.g., Layer Mash">
-            </div>
-            
-            <!-- Category -->
-            <div class="input-group">
-                <label>Category</label>
-                <select id="productCategory" class="reason-select">
-                    <option value="">Select or type category...</option>
-                </select>
-            </div>
-            
-            <!-- UNIT OF MEASURE - NEW! -->
-            <div class="input-group">
-                <label>Unit of Measure <span class="required">*</span></label>
-                <select id="productUOM" class="reason-select" onchange="inventorySystem.handleUOMChange()">
-                    <option value="kg">Kilograms (kg) - Bulk Feeds/Grains</option>
-                    <option value="bags">Bags - Pre-packaged Products</option>
-                    <option value="litres">Litres (L) - Liquid Products</option>
-                    <option value="pieces">Pieces (pcs) - Individual Items</option>
-                    <option value="grams">Grams (g) - Small Quantities</option>
-                    <option value="ml">Millilitres (mL) - Small Liquids</option>
-                    <option value="sachets">Sachets/Packets - Small Packs</option>
-                    <option value="cartons">Cartons - Bulk Boxes</option>
-                    <option value="rolls">Rolls - Wire/Fencing</option>
-                    <option value="metres">Metres (m) - Length Products</option>
-                </select>
-            </div>
-            
-            <!-- KG SPECIFIC: Ngunia Size (only shown for kg) -->
-            <div class="input-group" id="nguniaSizeGroup">
-                <label>Ngunia/Bag Size (kg per bag) <span class="required">*</span></label>
-                <input type="number" id="productNguniaSize" class="adj-input" value="1000" min="1" step="1">
-                <small>How many kg makes one full ngunia/bag?</small>
-            </div>
-            
-            <!-- BAGS SPECIFIC: Kg per bag (only shown for bags) -->
-            <div class="input-group" id="kgPerBagGroup" style="display:none;">
-                <label>Weight per Bag (kg) <span class="required">*</span></label>
-                <input type="number" id="kgPerBag" class="adj-input" value="50" min="0.01" step="0.01">
-                <small>How many kg does one bag weigh?</small>
-            </div>
-            
-            <!-- Price (changes label based on UOM) -->
-            <div class="input-group">
-                <label id="priceLabel">Price per Kilogram (KSH) <span class="required">*</span></label>
-                <input type="number" id="productPrice" class="adj-input" placeholder="0.00" min="0" step="0.01">
-                <small id="priceHint">Enter the price per kg</small>
-            </div>
-            
-            <!-- Initial Stock Section -->
-            <div class="stock-section">
-                <h4>📦 Initial Stock</h4>
-                
-                <!-- For KG: Ngunias + Extra KG -->
-                <div class="input-row" id="stockKgInputs">
-                    <div class="input-group">
-                        <label id="mainUnitLabel1">Ngunias/Bags</label>
-                        <input type="number" id="productInitNgunias" class="adj-input" value="0" min="0" step="0.001">
-                    </div>
-                    <span class="plus-sign">+</span>
-                    <div class="input-group">
-                        <label>Extra Kg</label>
-                        <input type="number" id="productInitKg" class="adj-input" value="0" min="0" step="0.01">
-                    </div>
-                </div>
-                
-                <!-- For Bags: Number of bags (auto-calculates kg) -->
-                <div class="input-row" id="stockBagsInputs" style="display:none;">
-                    <div class="input-group">
-                        <label>Number of Bags</label>
-                        <input type="number" id="productInitBags" class="adj-input" value="0" min="0" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label>Total Weight (auto-calculated)</label>
-                        <input type="number" id="productBagsTotalKg" class="adj-input" value="0" disabled style="opacity:0.7;">
-                    </div>
-                </div>
-                
-                <!-- For Litres/ml: Quantity -->
-                <div class="input-row" id="stockVolumeInputs" style="display:none;">
-                    <div class="input-group">
-                        <label id="volumeLabel">Quantity (Litres)</label>
-                        <input type="number" id="productInitVolume" class="adj-input" value="0" min="0" step="0.01">
-                    </div>
-                </div>
-                
-                <!-- For Pieces/Sachets: Count -->
-                <div class="input-row" id="stockCountInputs" style="display:none;">
-                    <div class="input-group">
-                        <label id="countLabel">Quantity (Pieces)</label>
-                        <input type="number" id="productInitCount" class="adj-input" value="0" min="0" step="1">
-                    </div>
-                </div>
-                
-                <!-- For Cartons: Number of cartons with items per carton -->
-                <div class="input-row" id="stockCartonInputs" style="display:none;">
-                    <div class="input-group">
-                        <label>Number of Cartons</label>
-                        <input type="number" id="productInitCartons" class="adj-input" value="0" min="0" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label>Items per Carton</label>
-                        <input type="number" id="itemsPerCarton" class="adj-input" value="12" min="1" step="1">
-                    </div>
-                </div>
-                
-                <!-- For Rolls/Metres: Length -->
-                <div class="input-row" id="stockLengthInputs" style="display:none;">
-                    <div class="input-group">
-                        <label>Quantity (Rolls/Metres)</label>
-                        <input type="number" id="productInitLength" class="adj-input" value="0" min="0" step="0.01">
-                    </div>
-                </div>
-                
-                <!-- Total display -->
-                <div class="calculated-total" id="stockTotalDisplay" style="margin-top:10px;">
-                    <span>Total Stock:</span>
-                    <strong id="totalStockDisplay">0 kg</strong>
-                </div>
-            </div>
-            
-            <!-- Low Stock Threshold -->
-            <div class="input-group">
-                <label id="thresholdLabel">Low Stock Threshold</label>
-                <input type="number" id="productThreshold" class="adj-input" value="100" min="0" step="1">
-                <small id="thresholdHint">Alert when stock falls below this amount</small>
-            </div>
-            
-            <input type="hidden" id="editProductId" value="">
-            <input type="hidden" id="productUOMHidden" value="kg">
-        </div>
-        
-        <div class="modal-footer">
-            <button class="outline-btn" id="cancelProductBtn">Cancel</button>
-            <button class="green-btn" id="saveProductBtn">Save Product</button>
-        </div>
+    <div class="stat-card warning">
+      <span class="stat-icon">⚠️</span>
+      <div class="stat-info"><span class="stat-value" id="lowStockCount">0</span><span class="stat-label">Low Stock</span></div>
     </div>
+    <div class="stat-card danger">
+      <span class="stat-icon">❌</span>
+      <div class="stat-info"><span class="stat-value" id="outOfStockCount">0</span><span class="stat-label">Out of Stock</span></div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">💰</span>
+      <div class="stat-info"><span class="stat-value" id="totalValue">KSH 0</span><span class="stat-label">Stock Value</span></div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="inventory-main">
+    <div class="inventory-filters">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInventory" class="search-input" placeholder="Search products...">
+      </div>
+      <select id="filterCategory" class="filter-select"><option value="all">All Categories</option></select>
+      <select id="filterStatus" class="filter-select">
+        <option value="all">All Status</option>
+        <option value="in-stock">In Stock</option>
+        <option value="low-stock">Low Stock</option>
+        <option value="out-of-stock">Out of Stock</option>
+      </select>
+      <button class="outline-btn" id="exportInventoryBtn">📄 Export CSV</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Base Price</th>
+            <th>Bulk Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody">
+          <tr class="loading-row"><td colspan="7"><div class="loading-spinner"></div><p>Loading...</p></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-    
-    <!-- Firebase Config -->
-    <script src="js/firebase-config.js"></script>
-    
-    <!-- Particles Script -->
-    <script src="js/particles.js"></script>
-    
-    <!-- Inventory Script -->
-    <script src="js/inventory.js"></script>
+
+<!-- ADJUST STOCK MODAL -->
+<div class="modal-overlay" id="adjustStockModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="adjustModalTitle">Adjust Stock</h2>
+      <button class="close-modal" id="closeAdjustModal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="product-info-display" id="adjustProductInfo"></div>
+
+      <div class="adjustment-tabs">
+        <button class="adj-tab active" id="addTab">➕ Add</button>
+        <button class="adj-tab" id="removeTab">➖ Remove</button>
+      </div>
+
+      <div class="input-group">
+        <label id="adjQtyLabel">Quantity (base unit)</label>
+        <input type="number" id="adjQty" class="adj-input" value="0" min="0" step="0.01">
+        <small id="adjQtyHint"></small>
+      </div>
+
+      <div class="calculated-total">
+        <span>New stock will be:</span>
+        <strong id="newStockDisplay">—</strong>
+      </div>
+
+      <div class="input-group">
+        <label>Reason <span class="required">*</span></label>
+        <select id="adjReason" class="reason-select">
+          <option value="">Select reason...</option>
+          <option value="Supplier Delivery">Supplier Delivery</option>
+          <option value="Stock Correction">Stock Correction</option>
+          <option value="Returns">Customer Returns</option>
+          <option value="Damaged">Damaged Goods</option>
+          <option value="Expired">Expired Products</option>
+          <option value="Theft">Theft/Loss</option>
+          <option value="Transfer">Internal Transfer</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="input-group" id="otherReasonGroup" style="display:none;">
+        <label>Specify Reason</label>
+        <input type="text" id="adjOtherReason" class="adj-input" placeholder="Enter reason...">
+      </div>
+
+      <div class="input-group">
+        <label>Notes</label>
+        <textarea id="adjNotes" class="adj-textarea" placeholder="Optional"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="outline-btn" id="cancelAdjustBtn">Cancel</button>
+      <button class="green-btn" id="confirmAdjustBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal-content product-modal">
+    <div class="modal-header">
+      <h2 id="productModalTitle">Add Product</h2>
+      <button class="close-modal" id="closeProductModal">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="input-group">
+        <label>Product Name <span class="required">*</span></label>
+        <input type="text" id="productName" class="adj-input" placeholder="e.g. Layer Mash">
+      </div>
+
+      <div class="input-group">
+        <label>Category</label>
+        <select id="productCategory" class="reason-select">
+          <option value="">Select category...</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Base Unit <span class="required">*</span></label>
+        <select id="productBaseUnit" class="reason-select">
+          <option value="kg">Kilogram (kg)</option>
+          <option value="litre">Litre (L)</option>
+          <option value="piece">Piece (pc)</option>
+          <option value="metre">Metre (m)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Bulk Unit (optional)</label>
+        <select id="productBulkUnit" class="reason-select">
+          <option value="">None — sell only in base unit</option>
+          <option value="ngunia">Ngunia (feeds, grains)</option>
+          <option value="carton">Carton (packaged goods)</option>
+          <option value="roll">Roll (wire, fabric)</option>
+        </select>
+        <small>Choose a bulk unit if customers can buy a full ngunia/carton/roll.</small>
+      </div>
+
+      <div class="input-group" id="bulkSizeGroup" style="display:none;">
+        <label id="bulkSizeLabel">Size of one bulk unit (in base units) <span class="required">*</span></label>
+        <input type="number" id="productBulkSize" class="adj-input" value="50" min="1" step="0.01">
+        <small id="bulkSizeHint">e.g. one ngunia = 50 kg</small>
+      </div>
+
+      <div class="input-group">
+        <label id="priceBaseLabel">Price per base unit (KSH) <span class="required">*</span></label>
+        <input type="number" id="productPriceBase" class="adj-input" placeholder="0.00" min="0" step="0.01">
+      </div>
+
+      <div class="input-group" id="priceBulkGroup" style="display:none;">
+        <label id="priceBulkLabel">Price per bulk unit (KSH)</label>
+        <input type="number" id="productPriceBulk" class="adj-input" placeholder="Auto from base price" min="0" step="0.01">
+        <small>Leave blank to auto-calculate (base price × bulk size).</small>
+      </div>
+
+      <div class="stock-section">
+        <h4>📦 Initial Stock</h4>
+        <div class="input-group">
+          <label id="stockInputLabel">Stock in base units</label>
+          <input type="number" id="productStockBase" class="adj-input" value="0" min="0" step="0.01">
+          <small id="stockInputHint"></small>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label id="thresholdLabel">Low Stock Threshold (base units)</label>
+        <input type="number" id="productThreshold" class="adj-input" value="10" min="0" step="1">
+      </div>
+
+      <input type="hidden" id="editProductId" value="">
+    </div>
+    <div class="modal-footer">
+      <button class="outline-btn" id="cancelProductBtn">Cancel</button>
+      <button class="green-btn" id="saveProductBtn">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-content history-modal">
+    <div class="modal-header">
+      <h2>Stock History</h2>
+      <button class="close-modal" id="closeHistoryModal">×</button>
+    </div>
+    <div class="history-filters">
+      <select id="historyProduct" class="filter-select"><option value="all">All Products</option></select>
+      <select id="historyType" class="filter-select">
+        <option value="all">All Types</option>
+        <option value="add">Additions</option>
+        <option value="remove">Removals</option>
+      </select>
+      <button class="outline-btn" id="exportHistoryBtn">📄 Export CSV</button>
+    </div>
+    <div class="history-table-wrapper">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Product</th><th>Type</th>
+            <th>Quantity</th><th>Before</th><th>After</th>
+            <th>Reason</th><th>By</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody"><tr><td colspan="8">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/inventory.js"></script>
 </body>
 </html>
