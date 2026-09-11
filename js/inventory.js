@@ -1,5 +1,5 @@
 // ============================================
-// BASHAAN POS - INVENTORY (v2)
+// BASHAAN POS - INVENTORY (v2) not yet workinmggg!
 // ============================================
 
 class InventorySystem {
