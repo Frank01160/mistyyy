@@ -447,20 +447,20 @@ class InventorySystem {
 
     if (bulkUnit && !priceBulk) priceBulk = priceBase * bulkSize;
 
-    const data = {
-      name,
-      category: category || '',
-      categoryName: this.categoryName(category),
-      baseUnit,
-      bulkUnit,
-      bulkSize,
-      priceBase,
-      priceBulk: bulkUnit ? priceBulk : null,
-      stockBase,
-      lowStockThreshold: threshold,
-      archived: false,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
+const data = {
+  name: String(name),
+  category: category || '',
+  categoryName: this.categoryName(category),
+  baseUnit: String(baseUnit),
+  bulkUnit: bulkUnit || null,
+  bulkSize: Number(bulkSize) || 1,
+  priceBase: Number(priceBase) || 0,
+  priceBulk: bulkUnit ? (Number(priceBulk) || 0) : null,
+  stockBase: Number(stockBase) || 0,
+  lowStockThreshold: Number(threshold) || 10,
+  archived: false,
+  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+};
 
     try {
       if (editId) {
